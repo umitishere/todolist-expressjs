@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 
 let items = ["Buy Food", "Cook Food", "Eat Food"];
+let workItems = [];
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
@@ -22,7 +23,7 @@ app.get("/", (req, res) => {
     let day = today.toLocaleDateString("en-US", options);
 
     // list.ejs file has to be in the views folder and has to have .ejs extension (embedded js)
-    res.render("list", { kindOfDay: day, newListItems: items });
+    res.render("list", { listTitle: day, newListItems: items });
 
 });
 
@@ -30,12 +31,26 @@ app.post("/", (req, res) => {
 
     let item = req.body.newItem;
 
-    items.push(item);
+    if (req.body.list === "Work List") {
 
-    // Pass items array to app.get method.
-    res.redirect("/");
+        workItems.push(item);
+        res.redirect("/work");
+
+    } else {
+
+        items.push(item);
+        res.redirect("/");
+
+    }
 
 });
+
+app.get("/work", (req, res) => {
+
+    res.render("list", { listTitle: "Work List", newListItems: workItems });
+
+});
+
 
 app.listen(3000, () => {
     console.log("Server is running.");
